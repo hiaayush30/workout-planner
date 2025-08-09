@@ -6,15 +6,26 @@ export { default } from 'next-auth/middleware';
 
 export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request, secret: process.env.NEXT_AUTH_SECRET });
+    const { pathname } = request.nextUrl;
 
-    if (!token) {
+    // Public routes (accessible without login)
+    const publicRoutes = ['/login', '/signup'];
+
+    // If visiting login/signup while already logged in → go to dashboard
+    if (publicRoutes.includes(pathname) && token) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    // If visiting protected routes without token → go to login
+    if (pathname.startsWith('/dashboard') && !token) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    return NextResponse.next(); // Continue as normal
+    // Continue request
+    return NextResponse.next();
 }
 
-// Apply middleware only to these routes
+// run middleware on these routes
 export const config = {
-    matcher: ['/dashboard'],
+    matcher: ['/dashboard', '/login', '/signup'], 
 };

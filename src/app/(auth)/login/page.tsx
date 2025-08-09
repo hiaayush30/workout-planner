@@ -3,7 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import React, { FormEvent, useState } from "react";
 import Link from "next/link"; // Use Next.js Link for navigation
-import { Separator, Text } from "@radix-ui/themes";
+import { Separator, Spinner, Text } from "@radix-ui/themes";
 import { FaGoogle } from "react-icons/fa";
 import { signIn } from "next-auth/react";
 
@@ -33,14 +33,16 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setLoading(true)
         await signIn("credentials", {
             email,
             password,
             callbackUrl: "/dashboard"
         })
-        console.log("Login form submitted!");
+        alert("Logged in Successfully")
+        setLoading(false)
     };
-
+    const [loading, setLoading] = useState(false);
     return (
         <div className="pt-20 min-h-screen bg-gray-900 text-white font-sans flex flex-col items-center justify-center p-4">
             <motion.div
@@ -79,13 +81,14 @@ export default function LoginPage() {
                     </motion.div>
 
                     <motion.button
+                        disabled={loading}
                         type="submit"
-                        className="w-full cursor-pointer py-3 bg-blue-400 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
+                        className="flex items-center justify-center w-full cursor-pointer py-3 bg-blue-400 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
                     >
-                        Log In
+                        {loading ? <Spinner size={"3"}/> : "Log In"}
                     </motion.button>
                     <Text size="2">
                         or Login using:

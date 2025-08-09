@@ -3,7 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import React, { FormEvent, useState } from "react";
 import Link from "next/link"; // Use Next.js Link for navigation
-import { Separator, Text } from "@radix-ui/themes";
+import { Separator, Spinner, Text } from "@radix-ui/themes";
 import { FaGoogle } from "react-icons/fa";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
@@ -37,8 +37,10 @@ export default function SignUpPage() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const [loading,setLoading] = useState(false);
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setLoading(true)
         if (password !== confirmPassword) {
             return alert("Passwords do not match!")
         }
@@ -50,6 +52,7 @@ export default function SignUpPage() {
             if (error instanceof AxiosError) {
                 alert(error.response?.data?.error)
             }
+            setLoading(false)
         }
     };
 
@@ -110,12 +113,13 @@ export default function SignUpPage() {
 
                     <motion.button
                         type="submit"
-                        className="cursor-pointer w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
+                        className="flex justify-center items-center cursor-pointer w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
+                        disabled={loading}
                     >
-                        Sign Up
+                        {loading ? <Spinner size={"3"}/> : "Sign Up"}
                     </motion.button>
 
                     <Text size="2">
