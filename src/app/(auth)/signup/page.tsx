@@ -1,7 +1,7 @@
 "use client"; // Required for client-side interactions and framer-motion
 
 import { motion, Variants } from "framer-motion";
-import React from "react";
+import React, { FormEvent } from "react";
 import Link from "next/link"; // Use Next.js Link for navigation
 import { Separator, Text } from "@radix-ui/themes";
 import { FaGoogle } from "react-icons/fa";
@@ -28,7 +28,7 @@ const buttonVariants = {
 };
 
 export default function SignUpPage() {
-    const handleSubmit = (e) => {
+    const handleSubmit = (e:FormEvent) => {
         e.preventDefault();
         // Handle sign-up logic here
         console.log("Sign Up form submitted!");

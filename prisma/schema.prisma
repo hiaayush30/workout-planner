@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -21,13 +20,15 @@ enum Gender {
 }
 
 model User {
-  id               String @id @default(cuid())
-  email            String @unique
+  id               String   @id @default(cuid())
+  email            String   @unique
   name             String
-  profilePic       String @default("https://avatar.iran.liara.run/public")
+  password         String
+  profilePic       String
+  createdAt        DateTime @default(now())
   age              Int?
   height           Int?
-  workout          Json?
+  weight           Int?
   maintainence_cal Int?
   gender           Gender?
 }
