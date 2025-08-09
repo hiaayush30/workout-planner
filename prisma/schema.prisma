@@ -13,3 +13,21 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Gender {
+  male
+  female
+  other
+}
+
+model User {
+  id               String @id @default(cuid())
+  email            String @unique
+  name             String
+  profilePic       String @default("https://avatar.iran.liara.run/public")
+  age              Int?
+  height           Int?
+  workout          Json?
+  maintainence_cal Int?
+  gender           Gender?
+}
