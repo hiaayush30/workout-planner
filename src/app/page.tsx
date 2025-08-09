@@ -1,21 +1,41 @@
 "use client"; // This directive is necessary for using client-side features like framer-motion
 
-import { motion } from "framer-motion";
+import { DoubleArrowDownIcon } from "@radix-ui/react-icons";
+import { motion, Variants } from "framer-motion";
 import Image from "next/image";
-import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useRef } from "react";
 
 // Variants for Framer Motion animations
-const sectionVariants = {
+const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.0, 0.0, 0.58, 1.0] as const // "as const" fixes cubic-bezier typing
+    }
+  }
 };
 
-const imagePlaceholderVariants = {
+const imagePlaceholderVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeInOut"
+    }
+  }
 };
+
 
 export default function Home() {
+  const divRef = useRef<null | HTMLDivElement>(null);
+  const router = useRouter()
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans overflow-hidden">
       {/* Navbar */}
@@ -34,15 +54,9 @@ export default function Home() {
             MacroMind
           </motion.h1>
           <div className="hidden md:flex space-x-8">
-            <a href="#features" className="text-gray-300 hover:text-blue-400 transition-colors duration-300 text-lg">
-              Features
-            </a>
-            <a href="#about" className="text-gray-300 hover:text-blue-400 transition-colors duration-300 text-lg">
-              About
-            </a>
-            <a href="#download" className="text-gray-300 hover:text-blue-400 transition-colors duration-300 text-lg">
-              Download
-            </a>
+            <Link href="/login" className="text-gray-300 hover:text-blue-400 transition-colors duration-300 text-lg">
+              Signup/Login
+            </Link>
           </div>
           <button className="md:hidden text-white focus:outline-none">
             {/* Hamburger icon for mobile menu - can be implemented with Radix Dialog or custom logic */}
@@ -84,19 +98,34 @@ export default function Home() {
             >
               Your ultimate gym workout, nutrition, and progress tracking companion.
             </motion.p>
-            <motion.button
-              className="px-10 py-4 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xl rounded-full shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: "easeOut", delay: 1.2 }}
-            >
-              Get Started
-            </motion.button>
+            <div className="flex items-center max-md:justify-center">
+              <motion.button
+                className="px-10 py-4 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xl rounded-full shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, ease: "easeOut", delay: 1.2 }}
+                onClick={()=>router.push("/login")}
+              >
+                Get Started
+              </motion.button>
+              <motion.button
+                className="px-10 flex items-center gap-1 mx-3 py-4 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xl rounded-full shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, ease: "easeOut", delay: 1.2 }}
+                onClick={() => {
+                  divRef.current?.scrollIntoView({ behavior: "smooth" })
+                }}
+              >
+                <span>Read More</span>
+                <DoubleArrowDownIcon />
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Hero Image Placeholder */}
           <motion.div
-            className="relative w-full overflow-hidden md:w-1/2 h-80 sm:h-96 bg-red-500 rounded-xl shadow-lg flex items-center justify-center text-white text-2xl p-4 order-first md:order-last"
+            className="relative w-full overflow-hidden md:w-1/2 h-80 sm:h-96 rounded-xl shadow-lg flex items-center justify-center text-white text-2xl p-4 order-first md:order-last"
             variants={imagePlaceholderVariants}
             initial="hidden"
             animate="visible"
@@ -106,7 +135,7 @@ export default function Home() {
               src="/HeroImage.jpeg"
               alt="MacroMind"
               fill
-              className="object-cover" 
+              className="object-cover"
             />
           </motion.div>
 
@@ -114,7 +143,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-800">
+      <section id="features" className="py-20 bg-gray-800" ref={divRef}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.h3
             className="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-400"
@@ -135,18 +164,23 @@ export default function Home() {
               viewport={{ once: true, amount: 0.3 }}
               variants={sectionVariants}
             >
-              <h4 className="text-3xl font-semibold mb-4 text-green-400">Smart Workout Suggestions</h4>
+              <h4 className="text-3xl font-semibold mb-4 text-slate-300">Smart Workout Suggestions</h4>
               <p className="text-gray-300 text-lg mb-6">
                 Never wonder what to train again. MacroMind provides personalized gym workout plans tailored to your goals and progress.
               </p>
               <motion.div
-                className="w-full h-64 bg-red-500 rounded-lg flex items-center justify-center text-white text-xl"
+                className="relative overflow-hidden w-full h-64 rounded-lg flex items-center justify-center text-white text-xl"
                 variants={imagePlaceholderVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                Image Placeholder: Workout Suggestions
+                <Image
+                  src="/Workout.jpg"
+                  alt="Progress Tracking"
+                  fill
+                  className="object-cover"
+                />
               </motion.div>
             </motion.div>
 
@@ -163,13 +197,18 @@ export default function Home() {
                 Calculate your daily calorie maintenance needs based on your activity level and body metrics for effective weight management.
               </p>
               <motion.div
-                className="w-full h-64 bg-red-500 rounded-lg flex items-center justify-center text-white text-xl"
+                className="relative overflow-hidden w-full h-64 rounded-lg flex items-center justify-center text-white text-xl"
                 variants={imagePlaceholderVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                Image Placeholder: Calorie Calculation
+                <Image
+                  src="/Calorie.jpg"
+                  alt="Progress Tracking"
+                  fill
+                  className="object-cover"
+                />
               </motion.div>
             </motion.div>
 
@@ -186,13 +225,18 @@ export default function Home() {
                 Get smart food suggestions tailored to your calorie goals and dietary preferences, making healthy eating easy.
               </p>
               <motion.div
-                className="w-full h-64 bg-red-500 rounded-lg flex items-center justify-center text-white text-xl"
+                className="relative w-full h-64 overflow-hidden rounded-lg flex items-center justify-center text-white text-xl"
                 variants={imagePlaceholderVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                Image Placeholder: Food Suggestions
+                <Image
+                  src="/Food.jpg"
+                  alt="Progress Tracking"
+                  fill
+                  className="object-cover"
+                />
               </motion.div>
             </motion.div>
 
@@ -208,15 +252,21 @@ export default function Home() {
               <p className="text-gray-300 text-lg mb-6">
                 Log your workouts, meals, and measurements to visualize your journey and stay motivated.
               </p>
-              <motion.div
-                className="w-full h-64 bg-red-500 rounded-lg flex items-center justify-center text-white text-xl"
+             <motion.div
+                className="relative w-full h-64 overflow-hidden rounded-lg flex items-center justify-center text-white text-xl"
                 variants={imagePlaceholderVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                Image Placeholder: Progress Tracking
+                <Image
+                  src="/Tracking.jpg"
+                  alt="Progress Tracking"
+                  fill
+                  className="object-cover"
+                />
               </motion.div>
+
             </motion.div>
           </div>
         </div>
@@ -241,16 +291,17 @@ export default function Home() {
             viewport={{ once: true }}
             variants={sectionVariants}
           >
-            Download MacroMind today and start achieving your health and fitness goals with intelligent guidance.
+            Signup to MacroMind today and start achieving your health and fitness goals with intelligent guidance.
           </motion.p>
           <motion.button
-            className="px-12 py-5 bg-green-500 hover:bg-green-600 text-white font-bold text-2xl rounded-full shadow-xl transform transition-all duration-300 ease-in-out hover:scale-110"
+            className="cursor-pointer px-12 py-5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-2xl rounded-full shadow-xl transform transition-all duration-300 ease-in-out hover:scale-110"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.3 }}
+            onClick={()=>router.push("/login")}
           >
-            Get MacroMind Now!
+              Start Now!
           </motion.button>
         </div>
       </section>
