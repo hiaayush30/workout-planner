@@ -23,7 +23,7 @@ declare module "next-auth" {
         profilePic: string;
         gender: Gender | null;
         createdAt: Date;
-        password: string;
+        password: string| null;
         height: number | null;
         weight: number | null;
         maintainence_cal?: number | null;

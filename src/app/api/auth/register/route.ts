@@ -11,8 +11,10 @@ const NewUserSchema = z.object({
 
 export const POST = async (req: NextRequest) => {
     try {
-        const parsedData = NewUserSchema.safeParse(req.body);
+        const body = await req.json();
+        const parsedData = NewUserSchema.safeParse(body);
         if (!parsedData.success) {
+            console.log(parsedData.error.issues)
             return NextResponse.json({
                 error: "Invalid Request"
             }, { status: 400 })

@@ -1,10 +1,11 @@
 "use client"; // Required for client-side interactions and framer-motion
 
 import { motion, Variants } from "framer-motion";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import Link from "next/link"; // Use Next.js Link for navigation
 import { Separator, Text } from "@radix-ui/themes";
 import { FaGoogle } from "react-icons/fa";
+import { signIn } from "next-auth/react";
 
 // Variants for Framer Motion animations
 const pageVariants: Variants = {
@@ -28,9 +29,15 @@ const buttonVariants: Variants = {
 };
 
 export default function LoginPage() {
-    const handleSubmit = (e:FormEvent) => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        // Handle login logic here
+        await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: "/dashboard"
+        })
         console.log("Login form submitted!");
     };
 
@@ -54,6 +61,7 @@ export default function LoginPage() {
                 <motion.form onSubmit={handleSubmit} className="space-y-6" variants={formVariants}>
                     <motion.div variants={inputVariants}>
                         <input
+                            onChange={(e) => setEmail(e.target.value)}
                             type="email"
                             placeholder="Email"
                             className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg placeholder-gray-400 transition-all duration-300"
@@ -62,6 +70,7 @@ export default function LoginPage() {
                     </motion.div>
                     <motion.div variants={inputVariants}>
                         <input
+                            onChange={(e) => setPassword(e.target.value)}
                             type="password"
                             placeholder="Password"
                             className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg placeholder-gray-400 transition-all duration-300"
@@ -71,7 +80,7 @@ export default function LoginPage() {
 
                     <motion.button
                         type="submit"
-                        className="w-full py-3 bg-blue-400 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
+                        className="w-full cursor-pointer py-3 bg-blue-400 hover:bg-blue-600 text-white font-semibold text-xl rounded-lg shadow-md transform transition-all duration-300"
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
@@ -82,7 +91,9 @@ export default function LoginPage() {
                         or Login using:
                         <Separator my="3" size="4" color="blue" />
                         <div className="flex items-center justify-center">
-                            <div className="p-1 bg-white rounded-full hover:scale-110 transition-all cursor-pointer">
+                            <div
+                                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                                className="p-1 bg-white rounded-full hover:scale-110 transition-all cursor-pointer">
                                 <FaGoogle color="black" size={20} className="hover:text-blue-500" />
                             </div>
                         </div>

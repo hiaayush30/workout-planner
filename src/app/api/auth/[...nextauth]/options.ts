@@ -10,7 +10,7 @@ export const authOptions: AuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Username", type: "text", placeholder: "john" },
+                email: { label: "Email", type: "text", placeholder: "john" },
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {  //constructs the jwt token
@@ -26,8 +26,10 @@ export const authOptions: AuthOptions = {
                 })
 
                 if (user) {
+                    if(!user.password) throw new Error("Login using Google")
+                        
                     if (!bcrypt.compareSync(credentials.password, user.password)) {
-                        throw new Error("Password or Username incorrect!")
+                        throw new Error("Email or Password incorrect!")
                     }
                     // Any object returned will be saved in `user` property of the JWT
                     return user
@@ -78,6 +80,14 @@ export const authOptions: AuthOptions = {
                     token.maintainence_cal = foundUser.maintainence_cal;
                     token.height = foundUser.height;
                     token.weight = foundUser.weight;
+                } else {
+                    await prisma.user.create({
+                        data:{
+                            email:profile.email!,
+                            name:profile.name || profile.email!.split("@")[0],
+                            profilePic:`https://avatar.iran.liara.run/username?username=${profile.name}`,
+                        }
+                    })
                 }
             }
             return token
@@ -105,7 +115,8 @@ export const authOptions: AuthOptions = {
         }
     },
     pages: {
-        error: '/login'
+        error: '/login',
+        signIn:"/login"
     },
     secret: process.env.NEXTAUTH_SECRET
 }
